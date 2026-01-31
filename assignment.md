@@ -21,8 +21,37 @@ Each entity has the following attributes:
 Answer:
 
 ```dbml
+Table users {
+  id int [pk, increment]
+  username varchar [not null, unique]
+  email varchar [not null, unique]
+  created_at timestamp [not null]
+}
 
-```
+Table posts {
+  id int [pk, increment]
+  title varchar [not null]
+  body text [not null]
+  user_id int [not null]
+  status varchar [not null] // e.g., draft, published, archived
+  created_at timestamp [not null]
+}
+
+Table follows {
+  following_user_id int [not null]
+  followed_user_id int [not null]
+  created_at timestamp [not null]
+
+  Indexes {
+    (following_user_id, followed_user_id) [pk]
+  }
+}
+
+Ref: posts.user_id > users.id
+Ref: follows.following_user_id > users.id
+Ref: follows.followed_user_id > users.id
+
+
 
 ### Question 2
 
@@ -37,11 +66,43 @@ There are 4 entities, think of what attributes each entity should have.
 
 Answer:
 
-```dbml
+Table customers {
+  id int [pk, increment]
+  name varchar [not null]
+  email varchar [not null, unique]
+  created_at timestamp [not null]
+}
 
-```
+Table books {
+  id int [pk, increment]
+  title varchar [not null]
+  author varchar [not null]
+  isbn varchar [unique]
+  price decimal(10,2) [not null]
+  stock_qty int [not null, default: 0]
+  created_at timestamp [not null]
+}
 
-## Submission
+Table carts {
+  id int [pk, increment]
+  customer_id int [not null]
+  status varchar [not null] // e.g., active, checked_out, abandoned
+  created_at timestamp [not null]
+}
 
-- Submit the URL of the GitHub Repository that contains your work to NTU black board.
-- Should you reference the work of your classmate(s) or online resources, give them credit by adding either the name of your classmate or URL.
+Table cart_items {
+  id int [pk, increment]
+  cart_id int [not null]
+  book_id int [not null]
+  quantity int [not null, default: 1]
+  unit_price decimal(10,2) [not null] // price at time of adding to cart
+  created_at timestamp [not null]
+
+  Indexes {
+    (cart_id, book_id) [unique]
+  }
+}
+
+Ref: carts.customer_id > customers.id
+Ref: cart_items.cart_id > carts.id
+Ref: cart_items.book_id > books.id
